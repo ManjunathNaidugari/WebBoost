@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebBoost Analyzer - AI-Powered Content Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Particle Background Canvas -->
+    <canvas id="particleCanvas"></canvas>
+    
+    <!-- Cursor Trail Container -->
+    <div id="cursorTrail"></div>
+    
+    <div class="landing-container landing-hero">
+        <nav class="navbar">
+            <!-- <div class="logo">
+                <span class="logo-icon">♦</span> WebBoost 
+            </div> -->
+            <div class="nav-links">
+                <a href="/" class="nav-link active">HOME</a>
+                <!-- <a href="/analyzer" class="nav-link">DEMO</a> -->
+                <a href="#team" class="nav-link">About Team</a>
+                <a href="https://github.com" target="_blank" class="nav-link">GITHUB</a>
+            </div>
+        </nav>
+
+        <div class="hero-center">
+            <h1 class="hero-mega-title">
+                <span class="glitch-text">WebBoost</span>
+            </h1>
+            
+            <p class="hero-mega-subtitle">
+                Discover insights hidden within your blog posts like never before.
+            </p>
+
+            <a href="/analyzer" class="cta-button-hero">
+                EXPERIENCE THE FUTURE
+            </a>
+        </div>
+
+        <!-- Team Section -->
+        <div class="team-section" id="team">
+            <h2 class="team-title">Meet Our Team - Hakuna Matata</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <a href="https://www.linkedin.com/in/soyeong-jeong-839567390/" target="_blank" class="team-member-link">
+                        <div class="team-member-avatar">SJ</div>
+                        <div class="team-member-name">Soyeong Jeong</div>
+                        <div class="team-member-role">Developer</div>
+                    </a>
+                </div>
+                <div class="team-member">
+                    <a href="https://www.linkedin.com/in/krishirajsinh-p/" target="_blank" class="team-member-link">
+                        <div class="team-member-avatar">KP</div>
+                        <div class="team-member-name">Krishirajsinh P</div>
+                        <div class="team-member-role">Developer</div>
+                    </a>
+                </div>
+                <div class="team-member">
+                    <a href="https://www.linkedin.com/in/enkela-tafa-71138a285/" target="_blank" class="team-member-link">
+                        <div class="team-member-avatar">ET</div>
+                        <div class="team-member-name">Enkela Tafa</div>
+                        <div class="team-member-role">Developer</div>
+                    </a>
+                </div>
+                <div class="team-member">
+                    <a href="https://www.linkedin.com/in/manjunath-naidugari-287134204/" target="_blank" class="team-member-link">
+                        <div class="team-member-avatar">MN</div>
+                        <div class="team-member-name">Manjunath Naidugari</div>
+                        <div class="team-member-role">Developer</div>
+                    </a>
+                </div>
+                <div class="team-member">
+                    <a href="https://www.linkedin.com/in/vishnu-mehta-fib011235813/" target="_blank" class="team-member-link">
+                        <div class="team-member-avatar">VM</div>
+                        <div class="team-member-name">Vishnu Mehta</div>
+                        <div class="team-member-role">Developer</div>
+                    </a>
+                </div>
+                <div class="team-member">
+                    <div class="team-member-avatar">AG</div>
+                    <div class="team-member-name">Angel</div>
+                    <div class="team-member-role">Developer</div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+             Instant Results • Actionable Insights
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+</body>
+</html>

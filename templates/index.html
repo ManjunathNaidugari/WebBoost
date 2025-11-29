@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebBoost Analyzer - Website Analysis Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Fallback styles in case CSS doesn't load */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            padding: 0; 
+            margin: 0;
+            background: #0f172a; 
+            color: white;
+        }
+        .landing-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <noscript>
+        <div style="padding: 20px; background: #fee; color: #c33; text-align: center;">
+            <strong>JavaScript is required for this application to work.</strong>
+        </div>
+    </noscript>
+
+    <div class="landing-container">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                    <span class="logo-icon">♦</span> WebBoost
+                </a>
+            </div>
+        </nav>
+
+        <div class="hero-section">
+            <!-- <div class="badge">● v2.1 Analysis Engine Ready</div> -->
+            
+            <h1 class="hero-title">
+                Analyze your <span class="gradient-text">blog</span><br>
+                <span class="gradient-text">content</span>
+            </h1>
+            
+            <p class="hero-subtitle">
+                Intelligent, AI-powered blog post auditing.<br>
+                Improve your content with actionable insights and recommendations.
+            </p>
+
+            <div class="input-wrapper">
+                <form id="analyzeForm" action="/analyze" method="POST">
+                    <div class="search-box">
+                        <!-- <span class="search-icon">🔍</span> -->
+                        <input 
+                            type="text" 
+                            id="urlInput" 
+                            name="url"
+                            placeholder="enter blog post url..."
+                            required
+                        >
+                        <span class="enter-hint" id="enterHint">
+                            <span class="enter-key">↵</span> press enter
+                        </span>
+                    </div>
+                </form>
+            </div>
+            
+            {% if error %}
+            <div id="errorMessage" class="error-message" style="display: block;">
+                ❌ {{ error }}
+            </div>
+            {% endif %}
+        </div>
+
+        <footer class="landing-footer">
+            Instant Results • Actionable Insights
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+

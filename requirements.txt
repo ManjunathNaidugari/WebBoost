@@ -1,0 +1,29 @@
+# Core dependencies for WebBoost Analyzer
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+aiohttp>=3.9.0
+textstat>=0.7.3
+
+# Browser automation for dynamic content
+playwright>=1.40.0
+
+# Web interface
+flask>=3.0.0
+
+# Optional: Google Lighthouse CLI (for enhanced performance metrics)
+# Install with: npm install -g lighthouse
+# If not installed, the analyzer will use Playwright's built-in performance metrics
+
+# Standard library modules (no installation needed):
+# - re
+# - asyncio
+# - typing
+# - datetime
+# - urllib.parse
+# - json
+# - time
+# - math
+# - collections
+# - subprocess
+# - os
+

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - WebBoost Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="landing-container">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                    <span class="logo-icon">♦</span> WebBoost 
+                </a>
+            </div>
+        </nav>
+
+        <div class="results-header">
+            <h1 class="results-title">Analysis Results</h1>
+            <p class="results-url">{{ results.url }}</p>
+        </div>
+
+        <div class="results-card">
+            <!-- Overall Score -->
+            <div class="score-card overall-score" style="--overall-color: {% if results.overall_score >= 80 %}#10b981{% elif results.overall_score >= 60 %}#f97316{% else %}#ef4444{% endif %}; --overall-progress-deg: {{ results.overall_score * 3.6 }}deg; --overall-gradient: {% if results.overall_score >= 80 %}linear-gradient(135deg, #10b981 0%, #34d399 100%){% elif results.overall_score >= 60 %}linear-gradient(135deg, #f97316 0%, #fb923c 100%){% else %}linear-gradient(135deg, #ef4444 0%, #f87171 100%){% endif %}">
+                <div class="overall-score-left">
+                    <h2 class="overall-score-title">Overall Score</h2>
+                    <div class="description-toggle" onclick="toggleDescription()">
+                        <span class="toggle-icon" id="toggleIcon">▼</span>
+                        <span>Show Description</span>
+                    </div>
+                    <div class="description-content" id="descriptionContent">
+                        <div class="description-text">
+                            The overall score is a <strong>weighted average</strong>, not a simple average.
+                            This means some criteria matter more than others:<br><br>
+                            <strong>High Weight (20%):</strong><br>
+                            • Informativeness - How valuable your content is<br><br>
+                            <strong>Medium Weight (15% each):</strong><br>
+                            • Readability - How easy to read<br>
+                            • Engagement - How interesting<br>
+                            • Uniqueness - How original<br><br>
+                            <strong>Lower Weight (10% each):</strong><br>
+                            • Layout Quality - Design & mobile-friendliness<br>
+                            • Discoverability - Navigation & search<br><br>
+                            <strong>Small Weight (5% each):</strong><br>
+                            • SEO Keywords - Search optimization<br>
+                            • Ad Experience - Ad intrusiveness<br>
+                            • Social Integration - Social media presence<br><br>
+                            <em>Think of it like: A test where some questions are worth more points than others!</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="overall-score-right">
+                    <div class="overall-circular-progress">
+                        <div class="overall-inner-circle">
+                            <span class="overall-score-number">{{ "%.0f"|format(results.overall_score) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function toggleDescription() {
+                    const content = document.getElementById('descriptionContent');
+                    const icon = document.getElementById('toggleIcon');
+                    content.classList.toggle('expanded');
+                    icon.classList.toggle('expanded');
+                }
+            </script>
+
+            <!-- Detailed Scores Grid -->
+            <div class="scores-grid">
+                <h3>Detailed Analysis</h3>
+                <div class="scores-container">
+                    {% set tooltips = {
+                        'readability': '<strong>How easy is your content to read?</strong><br><br>We check:<br>• Sentence length (shorter = better)<br>• Word complexity (simpler words = better)<br>• Reading level (aim for 8th-9th grade level)<br><br><em>Think of it like: Can a 13-year-old understand your content?</em>',
+                        'informativeness': '<strong>How valuable and thorough is your content?</strong><br><br>We check:<br>• Word count (more content = more depth)<br>• Headers and structure (organized content)<br>• Images and links (supporting materials)<br>• Citations and sources (credible information)<br><br><em>Think of it like: Is your content a quick snack or a full meal?</em>',
+                        'engagement': '<strong>How interesting and interactive is your content?</strong><br><br>We check:<br>• Positive language (enthusiastic words)<br>• Questions and exclamations (conversational tone)<br>• Call-to-action buttons (clear next steps)<br>• Easy to skim (headers, lists, bold text)<br><br><em>Think of it like: Does your content make people want to keep reading?</em>',
+                        'uniqueness': '<strong>How original and unique is your content?</strong><br><br>We check:<br>• Original research and data<br>• Personal perspective (first-person writing)<br>• Word variety (not repetitive)<br>• Primary sources (interviews, surveys, studies)<br><br><em>Think of it like: Is this content only found on your site, or copied from elsewhere?</em>',
+                        'layout_quality': '<strong>How well-designed and user-friendly is your site?</strong><br><br>We check:<br>• Mobile-friendly (works on phones)<br>• HTTPS security (secure connection)<br>• Clean design (good spacing, fonts)<br>• Proper structure (one main heading)<br><br><em>Think of it like: Does your site look professional and work on all devices?</em>',
+                        'discoverability': '<strong>How easy is it to find content on your site?</strong><br><br>We check:<br>• Search function (can users search?)<br>• Navigation menu (clear menu structure)<br>• Breadcrumbs (shows where you are)<br>• Categories and tags (organized content)<br>• Featured content (highlights important pages)<br><br><em>Think of it like: Can visitors easily find what they\'re looking for?</em>',
+                        'seo_keywords': '<strong>How well is your site optimized for search engines?</strong><br><br>We check:<br>• Page title (30-60 characters, descriptive)<br>• Meta description (120-160 characters)<br>• Keyword usage (1-2% keyword density)<br>• Internal links (links to other pages on your site)<br>• Google indexing (is your site in Google?)<br><br><em>Think of it like: Will Google show your site when people search?</em>',
+                        'ad_experience': '<strong>How intrusive are ads on your site?</strong><br><br>We check:<br>• Ad density (fewer ads = better)<br>• Ad placement (not blocking content)<br>• Auto-playing videos/audio (annoying for users)<br>• Pop-ups and overlays (interrupting experience)<br><br><em>Think of it like: Do ads get in the way of reading your content?</em>',
+                        'social_integration': '<strong>How well is your site connected to social media?</strong><br><br>We check:<br>• Social media links (Facebook, Twitter, etc.)<br>• Share buttons (easy to share content)<br>• Social proof (share counts, testimonials)<br>• Follower counts (shows popularity)<br><br><em>Think of it like: Can visitors easily share your content on social media?</em>'
+                    } %}
+                    {% set display_names = {
+                        'ad_experience': 'Ad Free Experience',
+                        'seo_keywords': 'SEO Optimization',
+                        'social_integration': 'Social Media',
+                        'layout_quality': 'Design & Layout'
+                    } %}
+                    {% for key, value in results.scores.items() %}
+                    {% set metric_color = '#ef4444' %}
+                    {% set metric_gradient = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)' %}
+                    {% if value >= 80 %}
+                        {% set metric_color = '#10b981' %}
+                        {% set metric_gradient = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)' %}
+                    {% elif value >= 60 %}
+                        {% set metric_color = '#f97316' %}
+                        {% set metric_gradient = 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)' %}
+                    {% endif %}
+                    <div class="score-card-item" style="--metric-color: {{ metric_color }}; --metric-gradient: {{ metric_gradient }}">
+                        <div class="score-card-header">
+                            <span class="score-card-title">{{ display_names.get(key, key.replace('_', ' ').title()) }}</span>
+                            <span class="tooltip">
+                                <span class="info-icon" title="Click for details">i</span>
+                                <span class="tooltiptext">
+                                    <div class="tooltip-title">{{ display_names.get(key, key.replace('_', ' ').title()) }}</div>
+                                    <div class="tooltip-content">
+                                        {{ tooltips.get(key, 'No description available.') | safe }}
+                                    </div>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="circular-progress" tabindex="0" style="--progress-deg: {{ value * 3.6 }}deg">
+                            <div class="inner-circle">
+                                <span class="score-number">{{ "%.0f"|format(value) }}</span>
+                            </div>
+                        </div>
+                        <!-- Hover overlay showing internal component numbers -->
+                        <div class="metric-overlay">
+                            <div class="mini-metrics">
+                                {% if key == 'readability' %}
+                                    {% set rd = results.free_data_sources.readability_details %}
+                                    {# Prefer per-formula value when available (>0), otherwise fall back to composite score #}
+                                    {% set fre = rd.flesch_reading_ease if rd.flesch_reading_ease and rd.flesch_reading_ease|float > 0 else rd.score %}
+                                    {% set fk = rd.flesch_kincaid_grade if rd.flesch_kincaid_grade and rd.flesch_kincaid_grade|float > 0 else rd.score %}
+                                    {% set fog = rd.gunning_fog if rd.gunning_fog and rd.gunning_fog|float > 0 else rd.score %}
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ fre|round(0) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Flesch Ease</div>
+                                        <div class="mini-value">{{ fre|round(1) }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ fk|round(0) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">FK Grade</div>
+                                        <div class="mini-value">{{ fk|round(1) }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ fog|round(0) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Gunning Fog</div>
+                                        <div class="mini-value">{{ fog|round(1) }}</div>
+                                    </div>
+                                    <div class="mini-item" style="width:120px">
+                                        <div class="mini-label">Text length</div>
+                                        <div class="mini-value">{{ rd.text_length }}</div>
+                                    </div>
+                                {% elif key == 'informativeness' %}
+                                    {% set cs = results.free_data_sources.content_stats %}
+                                    {% set cit = results.free_data_sources.citation_analysis %}
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ ((cs.word_count if cs.word_count else 0) if (cs.word_count if cs.word_count else 0) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Words</div>
+                                        <div class="mini-value">{{ cs.word_count }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ ((cs.header_count*10) if (cs.header_count*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Headers</div>
+                                        <div class="mini-value">{{ cs.header_count }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ ((cs.image_count*10) if (cs.image_count*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Media</div>
+                                        <div class="mini-value">{{ cs.image_count + cs.link_count }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ (cit.citation_score if cit.citation_score else 0)|round(0) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Citations</div>
+                                        <div class="mini-value">{{ cit.citation_count }}</div>
+                                    </div>
+                                {% elif key == 'engagement' %}
+                                    {% set e = results.free_data_sources.engagement_details %}
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ ((e.positive_words*10) if (e.positive_words*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Positive</div>
+                                        <div class="mini-value">{{ e.positive_words }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ ((e.negative_words*10) if (e.negative_words*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Negative</div>
+                                        <div class="mini-value">{{ e.negative_words }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ ((e.questions*10) if (e.questions*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Questions</div>
+                                        <div class="mini-value">{{ e.questions }}</div>
+                                    </div>
+                                {% elif key == 'layout_quality' %}
+                                    {% set d = results.free_data_sources.design %}
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ (d.whitespace_score)|round(0) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Whitespace</div>
+                                        <div class="mini-value">{{ d.whitespace_score }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ (d.typography_score)|round(0) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Typography</div>
+                                        <div class="mini-value">{{ d.typography_score }}</div>
+                                    </div>
+                                {% elif key == 'discoverability' %}
+                                    {% set il = results.free_data_sources.internal_linking %}
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ ((il.internal_links*2) if (il.internal_links*2) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Internal</div>
+                                        <div class="mini-value">{{ il.internal_links }}</div>
+                                    </div>
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ ((il.external_links*2) if (il.external_links*2) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">External</div>
+                                        <div class="mini-value">{{ il.external_links }}</div>
+                                    </div>
+                                {% elif key == 'seo_keywords' %}
+                                    {% set kw = results.free_data_sources.keyword_analysis %}
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ kw.keyword_density|round(0) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Density</div>
+                                        <div class="mini-value">{{ kw.keyword_density }}%</div>
+                                    </div>
+                                {% elif key == 'social_integration' %}
+                                    {% set s = results.free_data_sources.social %}
+                                    <div class="mini-item">
+                                        <div class="mini-circle" style="--value: {{ (((s.sharing_buttons if s.sharing_buttons else 0)*10) if ((s.sharing_buttons if s.sharing_buttons else 0)*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
+                                        <div class="mini-label">Shares</div>
+                                        <div class="mini-value">{{ s.sharing_buttons if s.sharing_buttons else 0 }}</div>
+                                    </div>
+                                {% else %}
+                                    <div class="mini-item">
+                                        <div class="mini-label">Details</div>
+                                        <div class="mini-value">Unavailable</div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-section">
+                <h3>Key Metrics</h3>
+                <div class="metrics-grid">
+                    {% if results.free_data_sources.performance and results.free_data_sources.performance.load_time %}
+                    <div class="metric-item">
+                        <div class="metric-label">
+                            Load Time
+                            <span class="tooltip">
+                                <span class="info-icon" title="Click for details">i</span>
+                                <span class="tooltiptext">
+                                    <div class="tooltip-title">Load Time</div>
+                                    <div class="tooltip-content">How long it takes for your page to fully load. Lower is better! Aim for under 3 seconds. Fast loading keeps visitors from leaving.</div>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="metric-value">{{ "%.2f"|format(results.free_data_sources.performance.load_time) }}s</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if results.free_data_sources.keyword_analysis %}
+                    <div class="metric-item">
+                        <div class="metric-label">
+                            Keyword Density
+                            <span class="tooltip">
+                                <span class="info-icon" title="Click for details">i</span>
+                                <span class="tooltiptext">
+                                    <div class="tooltip-title">Keyword Density</div>
+                                    <div class="tooltip-content">The percentage of times your main keyword appears in the content. Ideal range is 1-2%. Too low = not optimized, too high = spammy.</div>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="metric-value">{{ "%.2f"|format(results.free_data_sources.keyword_analysis.keyword_density) }}%</div>
+                    </div>
+                    {% endif %}
+
+                    {% if results.free_data_sources.internal_linking %}
+                    <div class="metric-item">
+                        <div class="metric-label">
+                            Internal Links
+                            <span class="tooltip">
+                                <span class="info-icon" title="Click for details">i</span>
+                                <span class="tooltiptext">
+                                    <div class="tooltip-title">Internal Links</div>
+                                    <div class="tooltip-content">Links pointing to other pages on your own website. More internal links help visitors discover more content and improve SEO. Aim for 3-10 per page.</div>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="metric-value">{{ results.free_data_sources.internal_linking.internal_links }}</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">
+                            External Links
+                            <span class="tooltip">
+                                <span class="info-icon" title="Click for details">i</span>
+                                <span class="tooltiptext">
+                                    <div class="tooltip-title">External Links</div>
+                                    <div class="tooltip-content">Links pointing to other websites. External links to reputable sources add credibility and value. Aim for 2-5 quality external links per page.</div>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="metric-value">{{ results.free_data_sources.internal_linking.external_links }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if results.free_data_sources.citation_analysis %}
+                    <div class="metric-item">
+                        <div class="metric-label">
+                            Citations
+                            <span class="tooltip">
+                                <span class="info-icon" title="Click for details">i</span>
+                                <span class="tooltiptext">
+                                    <div class="tooltip-title">Citations Found</div>
+                                    <div class="tooltip-content">Number of references, sources, or citations in your content. Citations add credibility and show you've done research. More citations = more trustworthy content.</div>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="metric-value">{{ results.free_data_sources.citation_analysis.citation_count }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recommendations-section">
+                <h3>💡 Recommendations</h3>
+                <div class="recommendations-list">
+                    {% for rec in results.recommendations[:10] %}
+                    <div class="recommendation-item 
+                        {% if '🔴' in rec %}critical{% elif '🟠' in rec %}high{% elif '🟡' in rec %}medium{% endif %}">
+                        {{ rec.replace('🔴', '').replace('🟠', '').replace('🟡', '').strip() }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="/analyzer" class="cta-button" style="text-decoration: none; display: inline-block; width: auto; padding: 12px 32px;">Analyze Another Page</a>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+         Instant Results • Actionable Insights
+        </footer>
+    </div>
+</body>
+</html>
