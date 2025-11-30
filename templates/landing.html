@@ -17,7 +17,7 @@
         <nav class="navbar">
             <div class="nav-links">
                 <a href="#home" class="nav-link active">HOME</a>
-                <!-- <a href="/analyzer" class="nav-link">DEMO</a> -->
+                <a href="#demo" class="nav-link">DEMO</a>
                 <a href="#features" class="nav-link">FEATURES</a>
                 <a href="#team" class="nav-link">TEAM</a>
                 <a href="https://github.com/ManjunathNaidugari/WebBoost" target="_blank" class="nav-link">GITHUB</a>
@@ -43,6 +43,19 @@
             <a href="/analyzer" class="cta-button-hero">
                 Run a Scan
             </a>
+        </div>
+
+        <!-- Demo Section -->
+        <div class="demo-section" id="demo">
+            <h2 class="demo-title">See It In Action</h2>
+            <div class="video-wrapper">
+                <div class="video-container">
+                    <video controls class="demo-video">
+                        <source src="{{ url_for('static', filename='videos/demo_video.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
         </div>
 
         <!-- Features Section -->
