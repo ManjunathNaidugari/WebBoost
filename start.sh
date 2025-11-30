@@ -21,4 +21,4 @@ fi
 
 # Activate virtual environment and run the application
 source .venv/bin/activate
-python3 WebBoostApp.py
+python3 app.py
