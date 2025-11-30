@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis Results - WebBoost Analyzer</title>
+    <title>Results - WebBoost Analyzer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -121,114 +121,363 @@
                         </div>
                         <!-- Hover overlay showing internal component numbers -->
                         <div class="metric-overlay">
+                            <div class="overlay-header">
+                                <h4>{{ display_names.get(key, key.replace('_', ' ').title()) }} Breakdown</h4>
+                            </div>
                             <div class="mini-metrics">
-                                {% if key == 'readability' %}
-                                    {% set rd = results.free_data_sources.readability_details %}
-                                    {# Prefer per-formula value when available (>0), otherwise fall back to composite score #}
-                                    {% set fre = rd.flesch_reading_ease if rd.flesch_reading_ease and rd.flesch_reading_ease|float > 0 else rd.score %}
-                                    {% set fk = rd.flesch_kincaid_grade if rd.flesch_kincaid_grade and rd.flesch_kincaid_grade|float > 0 else rd.score %}
-                                    {% set fog = rd.gunning_fog if rd.gunning_fog and rd.gunning_fog|float > 0 else rd.score %}
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ fre|round(0) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Flesch Ease</div>
-                                        <div class="mini-value">{{ fre|round(1) }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ fk|round(0) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">FK Grade</div>
-                                        <div class="mini-value">{{ fk|round(1) }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ fog|round(0) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Gunning Fog</div>
-                                        <div class="mini-value">{{ fog|round(1) }}</div>
-                                    </div>
-                                    <div class="mini-item" style="width:120px">
-                                        <div class="mini-label">Text length</div>
-                                        <div class="mini-value">{{ rd.text_length }}</div>
-                                    </div>
-                                {% elif key == 'informativeness' %}
-                                    {% set cs = results.free_data_sources.content_stats %}
-                                    {% set cit = results.free_data_sources.citation_analysis %}
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ ((cs.word_count if cs.word_count else 0) if (cs.word_count if cs.word_count else 0) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Words</div>
-                                        <div class="mini-value">{{ cs.word_count }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ ((cs.header_count*10) if (cs.header_count*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Headers</div>
-                                        <div class="mini-value">{{ cs.header_count }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ ((cs.image_count*10) if (cs.image_count*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Media</div>
-                                        <div class="mini-value">{{ cs.image_count + cs.link_count }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ (cit.citation_score if cit.citation_score else 0)|round(0) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Citations</div>
-                                        <div class="mini-value">{{ cit.citation_count }}</div>
-                                    </div>
-                                {% elif key == 'engagement' %}
-                                    {% set e = results.free_data_sources.engagement_details %}
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ ((e.positive_words*10) if (e.positive_words*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Positive</div>
-                                        <div class="mini-value">{{ e.positive_words }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ ((e.negative_words*10) if (e.negative_words*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Negative</div>
-                                        <div class="mini-value">{{ e.negative_words }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ ((e.questions*10) if (e.questions*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Questions</div>
-                                        <div class="mini-value">{{ e.questions }}</div>
-                                    </div>
-                                {% elif key == 'layout_quality' %}
-                                    {% set d = results.free_data_sources.design %}
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ (d.whitespace_score)|round(0) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Whitespace</div>
-                                        <div class="mini-value">{{ d.whitespace_score }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ (d.typography_score)|round(0) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Typography</div>
-                                        <div class="mini-value">{{ d.typography_score }}</div>
-                                    </div>
-                                {% elif key == 'discoverability' %}
-                                    {% set il = results.free_data_sources.internal_linking %}
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ ((il.internal_links*2) if (il.internal_links*2) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Internal</div>
-                                        <div class="mini-value">{{ il.internal_links }}</div>
-                                    </div>
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ ((il.external_links*2) if (il.external_links*2) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">External</div>
-                                        <div class="mini-value">{{ il.external_links }}</div>
-                                    </div>
-                                {% elif key == 'seo_keywords' %}
-                                    {% set kw = results.free_data_sources.keyword_analysis %}
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ kw.keyword_density|round(0) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Density</div>
-                                        <div class="mini-value">{{ kw.keyword_density }}%</div>
-                                    </div>
-                                {% elif key == 'social_integration' %}
-                                    {% set s = results.free_data_sources.social %}
-                                    <div class="mini-item">
-                                        <div class="mini-circle" style="--value: {{ (((s.sharing_buttons if s.sharing_buttons else 0)*10) if ((s.sharing_buttons if s.sharing_buttons else 0)*10) < 100 else 100) }}%; --metric-color: var(--metric-color);"></div>
-                                        <div class="mini-label">Shares</div>
-                                        <div class="mini-value">{{ s.sharing_buttons if s.sharing_buttons else 0 }}</div>
+                                {% if results.score_breakdowns and results.score_breakdowns.get(key) %}
+                                    {% set bd = results.score_breakdowns[key] %}
+                                    
+                                    {% if key == 'readability' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Flesch Reading Ease</div>
+                                            <div class="mini-value">{{ bd.flesch_reading_ease|round(1) }}</div>
+                                            <div class="mini-ideal">Ideal: 60-70</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Flesch-Kincaid Grade</div>
+                                            <div class="mini-value">{{ bd.flesch_kincaid_grade|round(1) }}</div>
+                                            <div class="mini-ideal">Ideal: 6-8</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Gunning Fog Index</div>
+                                            <div class="mini-value">{{ bd.gunning_fog|round(1) }}</div>
+                                            <div class="mini-ideal">Ideal: < 12</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">SMOG Index</div>
+                                            <div class="mini-value">{{ bd.smog_index|round(1) }}</div>
+                                            <div class="mini-ideal">Ideal: 8-10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Automated Readability</div>
+                                            <div class="mini-value">{{ bd.automated_readability|round(1) }}</div>
+                                            <div class="mini-ideal">Ideal: 6-8</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Coleman-Liau Index</div>
+                                            <div class="mini-value">{{ bd.coleman_liau|round(1) }}</div>
+                                            <div class="mini-ideal">Ideal: 6-8</div>
+                                        </div>
+                                        
+                                    {% elif key == 'informativeness' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Word Count</div>
+                                            <div class="mini-value">{{ bd.word_count }}</div>
+                                            <div class="mini-ideal">Ideal: 1500+ words</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Headers Found</div>
+                                            <div class="mini-value">{{ bd.header_count }}</div>
+                                            <div class="mini-ideal">Ideal: 10+ headers</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Images</div>
+                                            <div class="mini-value">{{ bd.image_count }}</div>
+                                            <div class="mini-ideal">Ideal: 5+ images</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Links</div>
+                                            <div class="mini-value">{{ bd.link_count }}</div>
+                                            <div class="mini-ideal">Ideal: 10+ links</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Depth Score</div>
+                                            <div class="mini-value">{{ bd.depth_score }}/30</div>
+                                            <div class="mini-ideal">Based on word count</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Structure Score</div>
+                                            <div class="mini-value">{{ bd.structure_score }}/25</div>
+                                            <div class="mini-ideal">Based on headers</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Media Score</div>
+                                            <div class="mini-value">{{ bd.media_score }}/20</div>
+                                            <div class="mini-ideal">Images + links</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Citation Score</div>
+                                            <div class="mini-value">{{ bd.citation_score }}/25</div>
+                                            <div class="mini-ideal">References found</div>
+                                        </div>
+                                        
+                                    {% elif key == 'engagement' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Positive Words</div>
+                                            <div class="mini-value">{{ bd.positive_words }}</div>
+                                            <div class="mini-ideal">More is better</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Negative Words</div>
+                                            <div class="mini-value">{{ bd.negative_words }}</div>
+                                            <div class="mini-ideal">Less is better</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Questions</div>
+                                            <div class="mini-value">{{ bd.questions }}</div>
+                                            <div class="mini-ideal">5-10 questions</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Exclamations</div>
+                                            <div class="mini-value">{{ bd.exclamations }}</div>
+                                            <div class="mini-ideal">Use sparingly</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">CTA Words</div>
+                                            <div class="mini-value">{{ bd.cta_words }}</div>
+                                            <div class="mini-ideal">3-5 calls-to-action</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Sentiment Score</div>
+                                            <div class="mini-value">{{ bd.sentiment_score|round(1) }}/100</div>
+                                            <div class="mini-ideal">50+ is positive</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Interaction Score</div>
+                                            <div class="mini-value">{{ bd.interaction_score }}/30</div>
+                                            <div class="mini-ideal">Questions + CTAs</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Skimming Score</div>
+                                            <div class="mini-value">{{ bd.skimming_score }}/100</div>
+                                            <div class="mini-ideal">Easy to scan</div>
+                                        </div>
+                                        
+                                    {% elif key == 'uniqueness' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Research Words</div>
+                                            <div class="mini-value">{{ bd.research_words }}</div>
+                                            <div class="mini-ideal">5+ mentions</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">First Person Words</div>
+                                            <div class="mini-value">{{ bd.first_person_words }}</div>
+                                            <div class="mini-ideal">Personal voice</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Unique Word Ratio</div>
+                                            <div class="mini-value">{{ (bd.unique_word_ratio * 100)|round(1) }}%</div>
+                                            <div class="mini-ideal">Ideal: 40%+</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Primary Research</div>
+                                            <div class="mini-value">{{ bd.primary_research_words }}</div>
+                                            <div class="mini-ideal">Original studies</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Research Bonus</div>
+                                            <div class="mini-value">{{ bd.research_bonus|round(1) }}/20</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">First Person Bonus</div>
+                                            <div class="mini-value">{{ bd.first_person_bonus|round(1) }}/15</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Uniqueness Bonus</div>
+                                            <div class="mini-value">{{ bd.uniqueness_bonus|round(1) }}/15</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Primary Research Bonus</div>
+                                            <div class="mini-value">{{ bd.primary_research_bonus|round(1) }}/10</div>
+                                        </div>
+                                        
+                                    {% elif key == 'discoverability' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Search Function</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.has_search else 'No' }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.search_score }}/15</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Navigation Menus</div>
+                                            <div class="mini-value">{{ bd.nav_count }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.navigation_score }}/20</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Breadcrumbs</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.has_breadcrumbs else 'No' }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.breadcrumb_score }}/15</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Sitemap Link</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.has_sitemap else 'No' }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.sitemap_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Featured Posts</div>
+                                            <div class="mini-value">{{ bd.featured_posts }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.featured_score }}/15</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Category Score</div>
+                                            <div class="mini-value">{{ bd.category_score }}/25</div>
+                                            <div class="mini-ideal">Good organization</div>
+                                        </div>
+                                        
+                                    {% elif key == 'ad_experience' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Total Ad Indicators</div>
+                                            <div class="mini-value">{{ bd.ad_indicator_count }}</div>
+                                            <div class="mini-ideal">Ideal: 2</div>
+                                        </div>
+                                        {% if bd.ad_types %}
+                                            {% for ad_type, count in bd.ad_types.items() %}
+                                            <div class="mini-item">
+                                                <div class="mini-label">{{ ad_type }}</div>
+                                                <div class="mini-value">{{ count }}</div>
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Placement Penalty</div>
+                                            <div class="mini-value">-{{ bd.placement_penalty }}</div>
+                                            <div class="mini-ideal">Bad placements</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Autoplay Penalty</div>
+                                            <div class="mini-value">-{{ bd.autoplay_penalty }}</div>
+                                            <div class="mini-ideal">Auto-playing media</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Ad Density Penalty</div>
+                                            <div class="mini-value">-{{ bd.ad_density_penalty }}</div>
+                                            <div class="mini-ideal">Too many ads</div>
+                                        </div>
+                                        
+                                    {% elif key == 'social_integration' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Platforms Found</div>
+                                            <div class="mini-value">{{ bd.platform_count }}</div>
+                                            <div class="mini-ideal">Ideal: 3-5 platforms</div>
+                                        </div>
+                                        {% if bd.platforms_found %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Detected Platforms</div>
+                                            <div class="mini-value">{{ bd.platforms_found|join(', ') }}</div>
+                                        </div>
+                                        {% endif %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Sharing Buttons</div>
+                                            <div class="mini-value">{{ bd.sharing_buttons }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.sharing_score }}</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Platform Score</div>
+                                            <div class="mini-value">{{ bd.platform_score }}/100</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Social Proof Score</div>
+                                            <div class="mini-value">{{ bd.social_proof_score }}/35</div>
+                                            <div class="mini-ideal">Shares + followers</div>
+                                        </div>
+                                        
+                                    {% elif key == 'layout_quality' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Viewport Meta Tag</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.has_viewport else 'No' }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.viewport_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Mobile Friendly</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.handheld_friendly else 'No' }}</div>
+                                            <div class="mini-ideal">Essential</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Touch Optimized</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.touch_optimized else 'No' }}</div>
+                                            <div class="mini-ideal">Essential</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">HTTPS Secure</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.has_https else 'No' }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.security_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">H1 Tag Count</div>
+                                            <div class="mini-value">{{ bd.h1_count }}</div>
+                                            <div class="mini-ideal">Ideal: 1</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Mobile Score</div>
+                                            <div class="mini-value">{{ bd.mobile_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Whitespace Score</div>
+                                            <div class="mini-value">{{ bd.whitespace_score }}/15</div>
+                                            <div class="mini-ideal">Good spacing</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Typography Score</div>
+                                            <div class="mini-value">{{ bd.typography_score }}/10</div>
+                                            <div class="mini-ideal">Readable fonts</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Color Contrast</div>
+                                            <div class="mini-value">{{ bd.color_contrast_score }}/5</div>
+                                            <div class="mini-ideal">Accessibility</div>
+                                        </div>
+                                        
+                                    {% elif key == 'seo_keywords' %}
+                                        <div class="mini-item">
+                                            <div class="mini-label">Has Title Tag</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.has_title else 'No' }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.title_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Title Length</div>
+                                            <div class="mini-value">{{ bd.title_length }} chars</div>
+                                            <div class="mini-ideal">Ideal: 30-60</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Meta Description</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.has_meta_desc else 'No' }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.meta_desc_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Meta Desc Length</div>
+                                            <div class="mini-value">{{ bd.meta_desc_length }} chars</div>
+                                            <div class="mini-ideal">Ideal: 120-160</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">H1 Tags</div>
+                                            <div class="mini-value">{{ bd.h1_count }}</div>
+                                            <div class="mini-ideal">Ideal: 1</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Google Indexed</div>
+                                            <div class="mini-value">{{ 'Yes' if bd.is_indexed else 'No' }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.indexing_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Schema Markup</div>
+                                            <div class="mini-value">{{ bd.schema_markup_count }}</div>
+                                            <div class="mini-ideal">Score: {{ bd.schema_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Keyword Score</div>
+                                            <div class="mini-value">{{ bd.keyword_score }}/30</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Linking Score</div>
+                                            <div class="mini-value">{{ bd.linking_score }}/20</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">Freshness Score</div>
+                                            <div class="mini-value">{{ bd.freshness_score }}/10</div>
+                                        </div>
+                                        <div class="mini-item">
+                                            <div class="mini-label">URL Score</div>
+                                            <div class="mini-value">{{ bd.url_score }}/10</div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="mini-item final-score-item">
+                                        <div class="mini-label"><strong>Final Score</strong></div>
+                                        <div class="mini-value"><strong>{{ "%.0f"|format(bd.final_score) }}/100</strong></div>
                                     </div>
                                 {% else %}
                                     <div class="mini-item">
-                                        <div class="mini-label">Details</div>
-                                        <div class="mini-value">Unavailable</div>
+                                        <div class="mini-label">No breakdown data</div>
                                     </div>
                                 {% endif %}
                             </div>
@@ -325,10 +574,15 @@
             <div class="recommendations-section">
                 <h3>💡 Recommendations</h3>
                 <div class="recommendations-list">
-                    {% for rec in results.recommendations[:10] %}
+                    {% for rec in results.recommendations %}
                     <div class="recommendation-item 
-                        {% if '🔴' in rec %}critical{% elif '🟠' in rec %}high{% elif '🟡' in rec %}medium{% endif %}">
-                        {{ rec.replace('🔴', '').replace('🟠', '').replace('🟡', '').strip() }}
+                        {% if '🔴' in rec %}critical
+                        {% elif '🟠' in rec %}high
+                        {% elif '🟡' in rec %}medium
+                        {% elif '🟢' in rec %}low
+                        {% elif '✅' in rec %}excellent
+                        {% endif %}">
+                        {{ rec.replace('🔴', '').replace('🟠', '').replace('🟡', '').replace('🟢', '').replace('✅', '').strip() }}
                     </div>
                     {% endfor %}
                 </div>

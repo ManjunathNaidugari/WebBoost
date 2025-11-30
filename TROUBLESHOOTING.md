@@ -9,17 +9,17 @@ python3 app.py
 
 # You should see:
 # 🚀 Starting WebBoost Analyzer Web Interface...
-# 📊 Open http://localhost:5000 in your browser
-# * Running on http://0.0.0.0:5000
+# 📊 Open http://localhost:5001 in your browser
+# * Running on http://0.0.0.0:5001
 ```
 
 ### 2. Check the URL
 Make sure you're visiting:
-- `http://localhost:5000` (not https://)
-- Or `http://127.0.0.1:5000`
+- `http://localhost:5001` (not https://)
+- Or `http://127.0.0.1:5001`
 
 ### 3. Test the server
-Visit: `http://localhost:5000/test`
+Visit: `http://localhost:5001/test`
 - If you see "Flask is working! ✅" - server is fine
 - If blank/error - server issue
 
@@ -51,7 +51,7 @@ weboost3/
 
 **Issue: "Template not found"**
 - Make sure `templates/` folder exists
-- Make sure `index.html` is inside `templates/`
+- Make sure `.html` files are inside `templates/`
 
 **Issue: CSS/JS not loading**
 - Check browser Network tab

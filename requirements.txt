@@ -2,7 +2,7 @@
 requests>=2.31.0
 beautifulsoup4>=4.12.0
 aiohttp>=3.9.0
-textstat>=0.7.3
+textstat==0.7.11
 
 # Browser automation for dynamic content
 playwright>=1.40.0

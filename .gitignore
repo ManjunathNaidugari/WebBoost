@@ -20,6 +20,10 @@ wheels/
 .installed.cfg
 *.egg
 
+# WebBoost specific
+webboost/__pycache__/
+
+
 # Virtual Environment
 venv/
 env/

@@ -13,7 +13,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 try:
-    from playwright.async_api import async_playwright  # type: ignore
+    from playwright.async_api import async_playwright  
     _PLAYWRIGHT_AVAILABLE = True
 except Exception:
     _PLAYWRIGHT_AVAILABLE = False
@@ -79,6 +79,38 @@ class WebBoostAnalyzer:
         self.stylesheets = []
         self.performance_metrics: Optional[Dict] = None
         self.load_time: Optional[float] = None
+    
+    def _validate_scores(self, scores: Dict[str, float]) -> Dict[str, float]:
+        """Validate and normalize all scores to 0-100 range"""
+        validated = {}
+        
+        for criterion, score in scores.items():
+            if not isinstance(score, (int, float)):
+                print(f"❌ Invalid score type for {criterion}: {type(score)}")
+                validated[criterion] = 0.0
+            elif score < 0 or score > 100:
+                print(f"⚠️  Score {criterion}={score:.2f} out of range, clamping to [0, 100]")
+                validated[criterion] = max(0.0, min(100.0, float(score)))
+            else:
+                validated[criterion] = float(score)
+        
+        return validated
+    
+    def _print_score_report(self, results: Dict) -> None:
+        """Print detailed score breakdown for debugging"""
+        print("\n" + "="*60)
+        print("WEBBOOST SCORE REPORT")
+        print("="*60)
+        
+        for criterion, score in results['scores'].items():
+            weight = SCORING_WEIGHTS.get(criterion, 0)
+            contribution = score * weight
+            bar = "█" * int(score / 5)  # Visual bar
+            print(f"{criterion:20s}: {score:5.1f}/100 {bar:20s} (weight: {weight:.2f}, contrib: {contribution:.2f})")
+        
+        print("-"*60)
+        print(f"{'OVERALL SCORE':20s}: {results['overall_score']:5.1f}/100")
+        print("="*60 + "\n")
     
     async def load_with_playwright(self):
         """Load website using Playwright for dynamic content"""
@@ -281,41 +313,55 @@ class WebBoostAnalyzer:
             ad_count += self.html.lower().count(indicator) if self.html else 0
         ad_details = {'ad_count': ad_count}
 
-        # Calculate all scores
-        scores = {
-            'readability': score_readability(self.text),
-            'informativeness': score_informativeness(self.text, self.soup, citation_analysis),
-            'engagement': score_engagement(self.text, self.soup),
-            'uniqueness': score_uniqueness(self.text),
-            'discoverability': score_discoverability(self.soup),
-            'ad_experience': score_ad_experience(self.html, self.soup),
-            'social_integration': score_social_integration(social_data),
-            'layout_quality': score_layout_quality(self.soup, mobile_data, security_data, design_metrics),
-            'seo_keywords': score_seo_keywords(self.soup, seo_data, keyword_analysis, internal_linking, content_freshness, self.url),
-        }
+        # Calculate all scores - SINGLE SOURCE OF TRUTH
+        # Each scoring function now returns (score, breakdown)
+        scores = {}
+        breakdowns = {}
+        
+        score, breakdown = score_readability(self.text)
+        scores['readability'] = score
+        breakdowns['readability'] = breakdown
+        
+        score, breakdown = score_informativeness(self.text, self.soup, citation_analysis)
+        scores['informativeness'] = score
+        breakdowns['informativeness'] = breakdown
+        
+        score, breakdown = score_engagement(self.text, self.soup)
+        scores['engagement'] = score
+        breakdowns['engagement'] = breakdown
+        
+        score, breakdown = score_uniqueness(self.text)
+        scores['uniqueness'] = score
+        breakdowns['uniqueness'] = breakdown
+        
+        score, breakdown = score_discoverability(self.soup)
+        scores['discoverability'] = score
+        breakdowns['discoverability'] = breakdown
+        
+        score, breakdown = score_ad_experience(self.html, self.soup)
+        scores['ad_experience'] = score
+        breakdowns['ad_experience'] = breakdown
+        
+        score, breakdown = score_social_integration(social_data)
+        scores['social_integration'] = score
+        breakdowns['social_integration'] = breakdown
+        
+        score, breakdown = score_layout_quality(self.soup, mobile_data, security_data, design_metrics)
+        scores['layout_quality'] = score
+        breakdowns['layout_quality'] = breakdown
+        
+        score, breakdown = score_seo_keywords(self.soup, seo_data, keyword_analysis, internal_linking, content_freshness, self.url)
+        scores['seo_keywords'] = score
+        breakdowns['seo_keywords'] = breakdown
 
-        # Ensure each detail dict exposes the computed metric score as a fallback
-        readability_details['score'] = scores.get('readability', 0)
-        engagement_details['score'] = scores.get('engagement', 0)
-        uniqueness_details['score'] = scores.get('uniqueness', 0)
-        ad_details['score'] = scores.get('ad_experience', 0)
-
-        # design_metrics exists; attach layout score
-        design_metrics['layout_score'] = scores.get('layout_quality', 0)
-
-        # social_data may be empty; ensure it contains a social score
-        social_data['social_score'] = scores.get('social_integration', 0)
-
-        # content_stats: attach informativeness fallback
-        content_stats['informativeness_score'] = scores.get('informativeness', 0)
-
-        # keyword analysis / seo
-        keyword_analysis['seo_score'] = scores.get('seo_keywords', 0)
+        # VALIDATE: Ensure all scores are 0-100
+        scores = self._validate_scores(scores)
 
         results = {
             'url': self.url,
             'analyzed_at': datetime.now().isoformat(),
             'scores': scores,
+            'score_breakdowns': breakdowns,  # NEW: Detailed sub-criteria breakdowns
             'free_data_sources': {
                 'performance': performance_data,
                 'mobile': mobile_data,
@@ -336,12 +382,28 @@ class WebBoostAnalyzer:
             'recommendations': []
         }
         
-        # Calculate overall score
-        overall = sum(
-            results['scores'][key] * SCORING_WEIGHTS[key]
-            for key in results['scores'].keys()
-        )
+        # Calculate overall score with transparency
+        overall = 0
+        score_breakdown = {}
+        
+        for key, weight in SCORING_WEIGHTS.items():
+            if key in scores:
+                contribution = scores[key] * weight
+                overall += contribution
+                score_breakdown[key] = {
+                    'raw_score': scores[key],
+                    'weight': weight,
+                    'contribution': contribution
+                }
+            else:
+                print(f"⚠️  Warning: Missing score for criterion '{key}'")
+        
         results['overall_score'] = round(overall, 2)
+        results['score_breakdown'] = score_breakdown
         results['recommendations'] = generate_recommendations(results['scores'], results['free_data_sources'])
+        
+        # Print debug report if enabled
+        if os.getenv('WEBBOOST_DEBUG', '0') == '1':
+            self._print_score_report(results)
         
         return results

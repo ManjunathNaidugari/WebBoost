@@ -112,14 +112,30 @@ class CursorTrail {
     }
     
     init() {
-        document.addEventListener('mousemove', (e) => this.addTrail(e));
+        // Mouse events for desktop
+        document.addEventListener('mousemove', (e) => this.addTrail(e.clientX, e.clientY));
+        
+        // Touch events for mobile
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                this.addTrail(touch.clientX, touch.clientY);
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                this.addTrail(touch.clientX, touch.clientY);
+            }
+        }, { passive: true });
     }
     
-    addTrail(e) {
+    addTrail(x, y) {
         const trail = document.createElement('div');
         trail.className = 'cursor-trail-dot';
-        trail.style.left = e.clientX + 'px';
-        trail.style.top = e.clientY + 'px';
+        trail.style.left = x + 'px';
+        trail.style.top = y + 'px';
         
         this.container.appendChild(trail);
         this.trails.push(trail);

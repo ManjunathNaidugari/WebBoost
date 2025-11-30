@@ -206,12 +206,25 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
 }
 
 .enter-hint.show {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
+}
+
+.enter-hint:hover .enter-key {
+    background: rgba(129, 140, 248, 0.25);
+    border-color: rgba(129, 140, 248, 0.5);
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(129, 140, 248, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .enter-key {
@@ -227,6 +240,7 @@ body {
     box-shadow: 0 2px 8px rgba(129, 140, 248, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
     animation: enterKeyPulse 2s ease-in-out infinite;
+    transition: all 0.3s ease;
 }
 
 @keyframes enterKeyPulse {
@@ -707,6 +721,16 @@ body {
     background: rgba(234, 179, 8, 0.1);
 }
 
+.recommendation-item.low {
+    border-left-color: #6366f1;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.recommendation-item.excellent {
+    border-left-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
 /* Loading Animation */
 @keyframes pulse {
     0%, 100% { opacity: 1; }
@@ -829,10 +853,20 @@ body {
 .hero-mega-subtitle {
     font-size: 1.3rem;
     color: #cbd5e1;
-    margin-bottom: 60px;
+    margin-bottom: 30px;
     max-width: 800px;
     line-height: 1.8;
     font-weight: 400;
+}
+
+.hero-support-text {
+    font-size: 1rem;
+    color: #94a3b8;
+    margin-bottom: 50px;
+    max-width: 700px;
+    line-height: 1.7;
+    font-weight: 300;
+    opacity: 0.9;
 }
 
 .cta-button-hero {
@@ -944,7 +978,7 @@ body {
     
     .results-card {
         padding: 20px;
-        background-color: #1a1a1a;
+        /* background-color: #1a1a1a; */
     }
     
     .overall-score {
@@ -969,6 +1003,18 @@ body {
     
     .overall-score-number {
         font-size: 2.5rem;
+    }
+    
+    .description-content.expanded {
+        max-height: 800px;
+    }
+    
+    .description-text {
+        padding: 16px;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        max-height: 700px;
+        overflow-y: auto;
     }
     
     .hero-mega-title {
@@ -1005,6 +1051,31 @@ body {
     .team-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
+    }
+    
+    /* Mobile search box adjustments */
+    #urlInput {
+        padding: 20px 120px 20px 24px;
+        font-size: 1rem;
+    }
+    
+    #urlInput::placeholder {
+        font-size: 0.95rem;
+    }
+    
+    .enter-hint {
+        right: 16px;
+        font-size: 0.85rem;
+        gap: 6px;
+    }
+    
+    .enter-key {
+        padding: 4px 8px;
+        font-size: 1.1rem;
+    }
+    
+    .search-icon {
+        display: none;
     }
 }
 
@@ -1135,13 +1206,13 @@ body {
 .metric-overlay {
     position: absolute;
     inset: 12px;
-    background: rgba(2,6,23,0.6);
+    background: rgba(2,6,23,0.95);
     border-radius: 12px;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    border: 1px solid rgba(255,255,255,0.03);
-    backdrop-filter: blur(6px);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
     z-index: 30;
     /* Use opacity/visibility to avoid layout reflow which causes flicker */
     opacity: 0;
@@ -1152,6 +1223,24 @@ body {
        so show is immediate but hide waits, preventing flicker when mouse briefly leaves */
     transition: opacity 160ms ease, transform 160ms ease, visibility 160ms;
     transition-delay: 160ms;
+    max-height: calc(100% - 24px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.overlay-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.overlay-header h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #10b981;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Show overlay when hovering the circular progress OR when hovering the overlay itself
@@ -1180,19 +1269,21 @@ body {
 }
 
 .mini-metrics {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    width: 100%;
 }
 
 .mini-item {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    width: 84px;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 8px 10px;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
 .mini-circle {
@@ -1217,13 +1308,56 @@ body {
 }
 
 .mini-label {
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: #94a3b8;
-    text-align: center;
+    font-weight: 500;
 }
 
 .mini-value {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: #e2e8f0;
+}
+
+.mini-ideal {
+    font-size: 0.7rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+.final-score-item {
+    grid-column: 1 / -1;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 10px;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.final-score-item .mini-label,
+.final-score-item .mini-value {
+    font-size: 1rem;
+    color: #10b981;
+}
+
+/* Custom scrollbar for metric overlay */
+.metric-overlay::-webkit-scrollbar {
+    width: 6px;
+}
+
+.metric-overlay::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 3px;
+}
+
+.metric-overlay::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px;
+}
+
+.metric-overlay::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
 }
