@@ -23,6 +23,7 @@ from webboost.analysis import (
     analyze_url_structure
 )
 
+nltk.data.path.append('../nltk_data')
 
 def normalize_grade(value, ideal_low, ideal_high, max_hard=20):
     if value <= ideal_low:
